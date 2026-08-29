@@ -1,0 +1,28 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Assemble package
+        run: |
+          mkdir -p package/siku_status
+          cp -r client server config translations fxmanifest.lua README.md package/siku_status/
+          cd package
+          zip -r ../siku_status.zip siku_status
+
+      - name: Attach to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" siku_status.zip --clobber
