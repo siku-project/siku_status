@@ -24,7 +24,7 @@ end
 ---@param definition table The status definition.
 ---@param value number The requested value.
 ---@return number value The value actually applied.
-local function applyValue(state, definition, value)
+function ApplyStatusValue(state, definition, value)
   local previous <const> = state.values[definition.name]
   local clamped <const> = math.min(definition.max, math.max(definition.min, value))
 
@@ -87,7 +87,7 @@ local function setStatus(source, name, value)
     return nil
   end
 
-  return applyValue(state, definition, value)
+  return ApplyStatusValue(state, definition, value)
 end
 
 --- Adds to one status. A food item feeds hunger this way.
@@ -107,7 +107,7 @@ local function addStatus(source, name, amount)
     return nil
   end
 
-  return applyValue(state, definition, state.values[definition.name] + amount)
+  return ApplyStatusValue(state, definition, state.values[definition.name] + amount)
 end
 
 --- Removes from one status.
@@ -136,7 +136,7 @@ local function resetStatus(source, name)
       return false
     end
 
-    applyValue(state, definition, definition.default)
+    ApplyStatusValue(state, definition, definition.default)
     return true
   end
 
@@ -147,7 +147,7 @@ local function resetStatus(source, name)
   end
 
   StatusRegistry.forEach(function(_, definition)
-    applyValue(state, definition, definition.default)
+    ApplyStatusValue(state, definition, definition.default)
   end)
 
   return true
