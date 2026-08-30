@@ -2,7 +2,7 @@
 
 A modular status system for the SIKU ecosystem — managing persistent character needs such as hunger and thirst with scalable state handling, configurable decay, thresholds, effects, and seamless integration across immersive FiveM roleplay experiences.
 
-![Version](https://img.shields.io/badge/version-0.2.0-4785bd)
+![Version](https://img.shields.io/badge/version-1.0.0-4785bd)
 ![FiveM](https://img.shields.io/badge/fx__version-cerulean-4785bd)
 ![Lua](https://img.shields.io/badge/Lua-5.4-4785bd)
 
