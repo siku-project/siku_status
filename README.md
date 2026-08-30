@@ -2,7 +2,7 @@
 
 A modular status system for the SIKU ecosystem — managing persistent character needs such as hunger and thirst with scalable state handling, configurable decay, thresholds, effects, and seamless integration across immersive FiveM roleplay experiences.
 
-![Version](https://img.shields.io/badge/version-0.1.0-4785bd)
+![Version](https://img.shields.io/badge/version-0.2.0-4785bd)
 ![FiveM](https://img.shields.io/badge/fx__version-cerulean-4785bd)
 ![Lua](https://img.shields.io/badge/Lua-5.4-4785bd)
 
@@ -63,15 +63,31 @@ Everything goes through server exports. Values are always clamped into the statu
 | `AddStatus` | `source`, `name`, `amount` | `number?` | Adds (a food item feeds hunger this way). |
 | `RemoveStatus` | `source`, `name`, `amount` | `number?` | Removes. |
 | `ResetStatus` | `source`, `name?` | `boolean` | Resets one status, or all of them, to defaults. |
+| `Consume` | `source`, `item` | `boolean` | Applies the `status` map a consumable declares — the export food and drink items point to. Returns whether anything was applied, which tells the inventory to spend the unit. |
 
 ```lua
--- A consumable, server-side, once the item was validated and removed:
+-- Direct API, server-side, once the action was validated:
 exports.siku_status:AddStatus(source, 'hunger', 25)
 exports.siku_status:AddStatus(source, 'thirst', 35)
 
 -- Reading:
 local thirst = exports.siku_status:GetStatus(source, 'thirst')
 ```
+
+### Consumables
+
+Food and drink never call this resource themselves: the inventory item declares its effects and points its use at the `Consume` export —
+
+```lua
+-- In siku_inventory's shared/items.lua:
+burger = {
+  -- …
+  status = { hunger = 35 },
+  server = { export = 'siku_status.Consume' },
+},
+```
+
+— and using the item flows through the inventory's declared-use pipeline. Amounts are clamped like every other write, negative values work (salty chips can cost thirst), and the unit is only spent when something was actually applied.
 
 ### Events
 
