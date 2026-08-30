@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Siku Studio'
 description 'A modular status system for the SIKU ecosystem — managing persistent character needs such as hunger and thirst with scalable state handling, configurable decay, thresholds, effects, and seamless integration across immersive FiveM roleplay experiences.'
-version '0.2.0'
+version '1.0.0'
 
 name 'siku_status'
 
