@@ -7,7 +7,6 @@ local UPSERT_QUERY <const> = table.concat({
 }, ' ')
 
 local states <const> = {}
-local characterBySession <const> = {}
 
 --- Rounds a value to what the database keeps.
 ---@param value number The in-memory value.
@@ -16,11 +15,12 @@ local function roundStored(value)
   return math.floor(value * PRECISION + 0.5) / PRECISION
 end
 
---- Gets the status state of the character a session is playing.
+--- Gets the status state of the character a session is playing, the core
+--- cache telling which character that is.
 ---@param sessionId any The player server id.
 ---@return table? state The state, or nil when no character is loaded.
 function GetStatusState(sessionId)
-  local characterId <const> = characterBySession[sessionId]
+  local characterId <const> = Siku.cache.getCurrentCharacterId(sessionId)
 
   if not characterId then
     return nil
@@ -122,7 +122,6 @@ function LoadCharacterStatuses(sessionId, characterId)
     loading = true,
   }
 
-  characterBySession[sessionId] = characterId
   states[characterId] = state
 
   MySQL.single(
@@ -146,23 +145,20 @@ function LoadCharacterStatuses(sessionId, characterId)
   )
 end
 
---- Forgets the character a session was playing.
----@param sessionId number The player server id.
+--- Forgets a character that left play.
+---@param characterId number The character id.
 ---@param persist boolean Whether the state is written before it goes.
 ---@return nil
-function ForgetCharacter(sessionId, persist)
-  local characterId <const> = characterBySession[sessionId]
+function ForgetCharacter(characterId, persist)
+  local state <const> = states[characterId]
 
-  if not characterId then
+  if not state then
     return
   end
 
-  local state <const> = states[characterId]
-
-  characterBySession[sessionId] = nil
   states[characterId] = nil
 
-  if state and persist and not state.loading then
+  if persist and not state.loading then
     SaveCharacterStatuses(state)
   end
 end
