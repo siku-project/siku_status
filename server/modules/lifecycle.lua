@@ -11,15 +11,24 @@ local function handleCharacterReady(sessionId, characterData)
     return
   end
 
-  ForgetCharacter(sessionId, true)
   LoadCharacterStatuses(sessionId, characterData.id)
 end
 
-AddEventHandler('siku:server:createCharacterInstance', handleCharacterReady)
+--- Writes back and forgets a character the core took out of play, on a
+--- switch as on a disconnect.
+---@param _ number The player server ID.
+---@param characterId number The character id.
+---@return nil
+local function handleCharacterReleased(_, characterId)
+  if type(characterId) ~= 'number' then
+    return
+  end
 
-AddEventHandler('playerDropped', function()
-  ForgetCharacter(source, true)
-end)
+  ForgetCharacter(characterId, true)
+end
+
+AddEventHandler('siku:server:createCharacterInstance', handleCharacterReady)
+AddEventHandler('siku:server:releaseCharacterInstance', handleCharacterReleased)
 
 AddEventHandler('onResourceStop', function(resource)
   if resource ~= GetCurrentResourceName() then
