@@ -21,9 +21,15 @@ local function consume(source, item)
   for name, amount in pairs(item.status) do
     local definition <const> = StatusRegistry.get(name)
 
-    if definition and type(amount) == 'number' and amount ~= 0 then
-      ApplyStatusValue(state, definition, state.values[definition.name] + amount)
-      applied = true
+    if not definition then
+      Siku.print.warn(T('status_unknown', tostring(name)))
+    elseif type(amount) ~= 'number' then
+      Siku.print.warn(T('status_invalid_value', definition.name))
+    elseif amount ~= 0 then
+      local previous <const> = state.values[definition.name]
+      local value <const> = ApplyStatusValue(state, definition, previous + amount)
+
+      applied = applied or value ~= previous
     end
   end
 
